@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GWAS Lookup</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <img src="logo.png" width=150px>
+      <p class="site-subtitle">Interpret GWAS variant associations across multiple genomics databases</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="search-section">
+      <form id="search-form" class="search-form" autocomplete="off">
+        <div class="search-field-group">
+          <label class="search-label" for="rsid-input">rsID</label>
+          <input
+            type="text"
+            id="rsid-input"
+            class="search-input"
+            placeholder="rs7903146"
+            spellcheck="false"
+            autofocus
+          >
+        </div>
+        <div class="search-or"><span>or</span></div>
+        <div class="search-field-group">
+          <label class="search-label" for="position-input">Position</label>
+          <div class="search-position-row">
+            <input
+              type="text"
+              id="position-input"
+              class="search-input"
+              placeholder="chr10:112998590"
+              spellcheck="false"
+            >
+            <select id="build-select" class="search-select">
+              <option value="hg38">hg38</option>
+              <option value="hg19">hg19</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="search-button" id="search-button">Search</button>
+        <div class="search-examples">
+          Examples:
+          <a href="#rsid=rs7903146" class="example-link" data-rsid="rs7903146">rs7903146</a>
+          <span class="sep">|</span>
+          <a href="#pos=10:112998590&build=hg38" class="example-link" data-position="chr10:112998590" data-build="hg38">chr10:112998590 (hg38)</a>
+        </div>
+      </form>
+    </section>
+
+    <section id="variant-card" class="variant-card hidden">
+      <!-- Identity row -->
+      <div class="variant-card-identity">
+        <div class="summary-card">
+          <span class="summary-rsid" id="summary-rsid"></span>
+          <span class="summary-sep">|</span>
+          <span class="summary-alleles" id="summary-alleles"></span>
+          <span class="summary-gene" id="summary-gene"></span>
+          <span class="summary-sep summary-pos-sep">|</span>
+          <span class="summary-build-label">GRCh38</span>
+          <span class="summary-position" id="summary-position-38"></span>
+          <span class="summary-sep">|</span>
+          <span class="summary-build-label">GRCh37</span>
+          <span class="summary-position" id="summary-position-37"></span>
+        </div>
+        <div class="variant-card-links">
+          <a id="vep-source-link" class="source-link" href="#" target="_blank" rel="noopener">Ensembl</a>
+          <a id="annotation-source-link" class="source-link" href="#" target="_blank" rel="noopener">Open Targets</a>
+        </div>
+      </div>
+
+      <!-- VEP scores (rendered by JS) -->
+      <div id="vep-content" class="variant-card-section"></div>
+
+      <!-- OT Annotation: consequences + allele freqs (rendered by JS) -->
+      <div id="annotation-content" class="variant-card-section"></div>
+    </section>
+
+    <nav id="section-nav" class="section-nav hidden">
+      <a href="#section-credible-sets" class="nav-tab active" data-section="credible-sets">Credible Sets</a>
+      <a href="#section-phewas" class="nav-tab" data-section="phewas">UKB</a>
+      <a href="#section-phewas-finngen" class="nav-tab" data-section="phewas-finngen">FinnGen</a>
+      <a href="#section-phewas-bbj" class="nav-tab" data-section="phewas-bbj">BBJ</a>
+      <a href="#section-eqtl" class="nav-tab" data-section="eqtl">GTEx</a>
+      <a href="#section-eqtl-catalogue" class="nav-tab" data-section="eqtl-catalogue">eQTL Catalogue</a>
+      <a href="#section-gene-disease" class="nav-tab" data-section="gene-disease">OMIM</a>
+    </nav>
+
+    <div id="results-container" class="results-container hidden">
+      <!-- Credible Sets Section -->
+      <section id="section-credible-sets" class="result-section">
+        <div class="section-header">
+          <h2 class="section-title">GWAS Credible Sets</h2>
+          <div class="section-meta">
+            <a id="credible-sets-source-link" class="source-badge" href="#" target="_blank" rel="noopener">Open Targets</a>
+          </div>
+        </div>
+        <div id="credible-sets-content" class="section-content">
+          <div class="skeleton-table">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PheWAS Section -->
+      <section id="section-phewas" class="result-section">
+        <div class="section-header">
+          <h2 class="section-title">PheWAS Associations</h2>
+          <div class="section-meta">
+            <a id="phewas-source-link" class="source-badge" href="#" target="_blank" rel="noopener">PheWeb UKB-TOPMed</a>
+          </div>
+        </div>
+        <div id="phewas-content" class="section-content">
+          <div class="skeleton-table">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FinnGen PheWAS Section -->
+      <section id="section-phewas-finngen" class="result-section">
+        <div class="section-header">
+          <h2 class="section-title">PheWAS Associations</h2>
+          <div class="section-meta">
+            <a id="phewas-finngen-source-link" class="source-badge" href="#" target="_blank" rel="noopener">FinnGen r12</a>
+          </div>
+        </div>
+        <div id="phewas-finngen-content" class="section-content">
+          <div class="skeleton-table">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BBJ PheWAS Section -->
+      <section id="section-phewas-bbj" class="result-section">
+        <div class="section-header">
+          <h2 class="section-title">PheWAS Associations</h2>
+          <div class="section-meta">
+            <a id="phewas-bbj-source-link" class="source-badge" href="#" target="_blank" rel="noopener">Biobank Japan</a>
+          </div>
+        </div>
+        <div id="phewas-bbj-content" class="section-content">
+          <div class="skeleton-table">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GTEx eQTL Section -->
+      <section id="section-eqtl" class="result-section">
+        <div class="section-header">
+          <h2 class="section-title">GTEx eQTL Associations</h2>
+          <div class="section-meta">
+            <a id="eqtl-source-link" class="source-badge" href="#" target="_blank" rel="noopener">GTEx</a>
+          </div>
+        </div>
+        <div id="eqtl-content" class="section-content">
+          <div class="skeleton-table">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- eQTL Catalogue Section -->
+      <section id="section-eqtl-catalogue" class="result-section">
+        <div class="section-header">
+          <h2 class="section-title">eQTL Catalogue</h2>
+          <div class="section-meta">
+            <a id="eqtl-catalogue-source-link" class="source-badge" href="#" target="_blank" rel="noopener">EBI eQTL Catalogue</a>
+          </div>
+        </div>
+        <div id="eqtl-catalogue-content" class="section-content">
+          <div class="skeleton-table">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gene-Disease Section -->
+      <section id="section-gene-disease" class="result-section">
+        <div class="section-header">
+          <h2 class="section-title">Gene-Disease Associations</h2>
+          <div class="section-meta">
+            <a id="gene-disease-source-link" class="source-badge" href="https://platform.opentargets.org" target="_blank" rel="noopener">Open Targets</a>
+          </div>
+        </div>
+        <div id="gene-disease-content" class="section-content">
+          <div class="skeleton-table">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="error-banner" class="error-banner hidden"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        Data from
+        <a href="https://pheweb.org/UKB-TOPMed/" target="_blank" rel="noopener">PheWeb UKB-TOPMed</a>,
+        <a href="https://pheweb.jp/" target="_blank" rel="noopener">PheWeb Biobank Japan</a>,
+        <a href="https://r12.finngen.fi/" target="_blank" rel="noopener">FinnGen r12</a>,
+        <a href="https://gtexportal.org" target="_blank" rel="noopener">GTEx Portal</a>,
+        <a href="https://www.ebi.ac.uk/eqtl/" target="_blank" rel="noopener">eQTL Catalogue</a>,
+        <a href="https://rest.ensembl.org" target="_blank" rel="noopener">Ensembl VEP</a>, and
+        <a href="https://platform.opentargets.org" target="_blank" rel="noopener">Open Targets Platform</a>.
+        All coordinates GRCh38.
+      </p>
+      <p>
+        <a href="https://github.com" target="_blank" rel="noopener">Source on GitHub</a>
+      </p>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

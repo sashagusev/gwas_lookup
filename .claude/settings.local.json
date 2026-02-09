@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:pheweb.org)",
+      "WebFetch(domain:gtexportal.org)",
+      "WebSearch",
+      "WebFetch(domain:platform-docs.opentargets.org)",
+      "WebFetch(domain:api.platform.opentargets.org)",
+      "WebFetch(domain:fivex.sph.umich.edu)",
+      "WebFetch(domain:www.omim.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:lab-notes.hakyimlab.org)",
+      "WebFetch(domain:docs.ropensci.org)",
+      "Bash(curl:*)",
+      "WebFetch(domain:cran.r-project.org)",
+      "WebFetch(domain:maayanlab.cloud)",
+      "Bash(python3:*)",
+      "WebFetch(domain:monarchinitiative.org)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:portaldev.sph.umich.edu)",
+      "WebFetch(domain:community.opentargets.org)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:clarewest.github.io)",
+      "Bash(node --check:*)",
+      "WebFetch(domain:www.ebi.ac.uk)",
+      "Bash(# Test the variant ID format query curl -s \"\"https://www.ebi.ac.uk/eqtl/api/v2/datasets/QTD000001/associations?variant=chr10_112998590_C_T&size=5\"\" 2>&1 | python3 -m json.tool)",
+      "Bash(# Test the v2 pos \\(region\\) query format curl -s \"\"https://www.ebi.ac.uk/eqtl/api/v2/datasets/QTD000001/associations?pos=10:112998000-112999000&size=5\"\" 2>&1 | python3 -m json.tool)",
+      "WebFetch(domain:rest.ensembl.org)"
+    ]
+  }
+}
